@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # installed
+    'crispy_forms',
     # user apps
     'home',
     'authentication',
@@ -117,6 +119,12 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Crispy form setting
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Default login url
+LOGIN_URL = '/auth/login'
+LOGIN_REDIRECT_URL = '/home'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

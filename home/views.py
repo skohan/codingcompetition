@@ -7,3 +7,6 @@ def landing_page(request):
 
 def user_info(request, username):
     return render(request, "home/user.html")
+
+def user_home(request):
+    return render(request, "home/home.html")
