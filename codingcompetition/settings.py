@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # user apps
     'home',
     'authentication',
+    'problems',
 ]
 
 MIDDLEWARE = [

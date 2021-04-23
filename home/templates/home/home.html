@@ -4,4 +4,38 @@
 
 {% block body %} 
 <h1>Welcome Hello {{user.username}}</h1>
+
+
+<h2 class="h2 text-muted">Here are the problems to solve</h2>
+
+<table class="table table-bordered table-hover">
+
+    <thead>
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Solved?</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for problem, is_solved in problems %}
+        <tr>
+            <td scope="row">
+                <a href="/problems/{{problem.problem_id}}"> {{problem.title}} </a>
+            </td>
+            <td>
+                {% if is_solved.solved %}
+                ✅
+                {% else %}
+                ❎
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody>
+
+
+</table>
+
 {% endblock %}

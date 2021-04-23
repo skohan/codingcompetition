@@ -6,6 +6,8 @@ from django.views import View
 from django.contrib import messages
 
 from .forms import RegistrationForm
+from problems.models import Problem
+from home.models import Solved
 
 # Create your views here.
 
@@ -32,10 +34,16 @@ class RegistrationView(View):
             print("------------valid--------------")
             user = form.save()
             login(request, user)
-            username = user.username
-            return redirect('/{}'.format(username))
+
+            # Setting all problems as not solved in db for user
+            all_problems = Problem.objects.all()
+            for problem in all_problems:
+                solved = Solved(problem = problem, user = user)
+                solved.save()
+
+
+            return redirect('/home')
         messages.error(request, "Unsuccessful registration. Invalid information.")
-        # print(super(RegistrationView, self).errors)
         print(form.error_messages)
 
         messages.error(request=request, message=form.error_messages)
