@@ -3,8 +3,12 @@
 {% block title %} Hello {{user.username}} {% endblock %}
 
 {% block body %} 
-<h1>Welcome Hello {{user.username}}</h1>
 
+{% if user.is_authenticated %}
+<h1>Welcome Hello {{user.username}}</h1>
+{% else %}
+<h1>Hi stranger</h1>
+{% endif %}
 
 <h2 class="h2 text-muted">Here are the problems to solve</h2>
 

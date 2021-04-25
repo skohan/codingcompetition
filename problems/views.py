@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 from .models import Problem
 from home.models import Solved
+from problems.utilities import get_all_problems
 # Create your views here.
 
 
@@ -9,13 +10,13 @@ def problems(request):
 
     context = {}
 
-    problems_all = Problem.objects.all()
-    problem_solved = Solved.objects.all()
+    user = request.user
 
-    context['problems'] = problems_all
-    context['problem_solved'] = problem_solved
+    context['problems'] = get_all_problems(user)
 
-    return render(request, 'problems/problems.html', context)
+    return render(request, 'home/home.html', context)
+
+    
 
 def problem_by_id(request, problem_id):
     

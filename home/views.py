@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 
 from problems.models import Problem
 from home.models import Solved
+
+from problems.utilities import get_all_problems
 # Create your views here.
 
 def landing_page(request):
@@ -19,9 +21,6 @@ def user_home(request):
 
     user = request.user
 
-    problems_all = Problem.objects.all()
-    problem_solved = Solved.objects.filter(user=user).all()
-
-    context['problems'] = zip(problems_all, problem_solved)
+    context['problems'] = get_all_problems(user)
 
     return render(request, "home/home.html", context)

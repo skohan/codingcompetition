@@ -40,10 +40,12 @@ INSTALLED_APPS = [
 
     # installed
     'crispy_forms',
+    'markdown_deux',
     # user apps
     'home',
     'authentication',
     'problems',
+    'submission'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +138,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Default destination of uploaded code
+UPLOAD_DESTINATION = 'submission/uploads/code/'
+
+# Time limit for code execution
+TIME_LIMIT = 1 # in secs
