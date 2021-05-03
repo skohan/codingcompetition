@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -8,7 +10,8 @@ from .utilities import do_magic
 
 class SubmitView(LoginRequiredMixin,View):
     
-    template_name = 'submission/result.html'
+    submit_template = ''
+    result_template = 'submission/result.html'
     file_name = 'file'
 
     def post(self, request, problem_id):
@@ -16,7 +19,11 @@ class SubmitView(LoginRequiredMixin,View):
         context = {}
         
         user = request.user
-        file = request.FILES[self.file_name]
+        file = request.FILES.get(self.file_name)
+
+        if file == None:
+            messages.warning(request, "File not provided!!")
+            return redirect('/problems/{}'.format(problem_id))
 
         results = do_magic(file, user, problem_id)
         context['results'] = results

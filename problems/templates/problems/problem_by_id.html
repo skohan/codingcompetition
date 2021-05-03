@@ -8,44 +8,42 @@ Problems {{problem.title}}
 {% block body %}
 {% load markdown_deux_tags %}
 
-<div>
-	<a href="/problems"> 🔙️ Back to problems</a>
-</div>
-
-<div class="row mt-3" style=" margin-left: auto; margin-right: auto">
-
-	<div class="col-sm" style="min-width: 60%">
-
-		<div  >
-		    <h2 class="text-muted">
-		        {{problem.title}}
-		    </h2>
-		</div>
-		<div>
-		    <p>
-		        {{problem.description|markdown}}
-		    </p>
-		</div>	
-
+<div class="container-md">
+	<div class="mt-5">
+		<a href="/problems/">
+			<button type="button" class="btn-outline-secondary btn">🔙 Go back</button>
+		</a>
 	</div>
 
+		<div class="container-lg mt-5" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+			<div class="row">
+				<div class="col-md-8">
 
-	<div class="col-sm">
-		<div >
-		    <h2 class="text-muted">
-		        Submit
-		    </h2>
-			<p class="text-muted">Submit your cpp file here</p>
+						<h2 class="text-muted">
+							{{problem.title}}
+						</h2>
+					
+				<p>
+					{{problem.description|markdown}}
+				</p>
+		
+				</div>
+		
+				<div class="col-md-4">
+					<h2 class="text-muted">
+						Submit
+					</h2>
+					<form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						<p>Submit your cpp file here</p>
+						<input type="file" name="file" id="file">
+						<button class="btn btn-outline-primary mt-2">Run</button>
+					</form>
+				</div>
+		
+			</div>
 		</div>
 
-		<div>
-			<form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data">
-				{% csrf_token %}
-				<input type="file" name="file" id="file">
-				<button type="submit" class="btn btn-primary mt-2">Run</button>
-			</form>
-		</div>
-	</div>
 
 </div>
 

@@ -47,7 +47,7 @@ def handle_file_upload(file, user, problem_id):
         :param problem_id: problem id for which solution file is uploaded for
     '''
 
-    file_path = UPLOAD_DESTINATION+user.username+str(problem_id)+file.name
+    file_path = UPLOAD_DESTINATION+user.username+str(problem_id)
 
     with open(file_path, 'wb+') as f:
         for chunks in file.chunks():
@@ -65,7 +65,7 @@ def compile(file_path):
     '''
     pass
 
-def test_on_case(executable_path, input):
+def test_on_case(executable_path, input_output):
     '''
         executes the executable's path given and provides input to it
         returns final output

@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:codingcompetition}/db.sqlite3",
+            "name": "coding competitions"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

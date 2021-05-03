@@ -27,5 +27,5 @@ Print a line that contains all values of n during the algorithm.
 
 
 
-#### Time Limit:
+#### Time Limit: It is always 1 sec for now
 	1 sec

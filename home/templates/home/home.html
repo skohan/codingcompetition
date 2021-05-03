@@ -2,44 +2,54 @@
 
 {% block title %} Hello {{user.username}} {% endblock %}
 
-{% block body %} 
 
-{% if user.is_authenticated %}
-<h1>Welcome Hello {{user.username}}</h1>
-{% else %}
-<h1>Hi stranger</h1>
-{% endif %}
 
-<h2 class="h2 text-muted">Here are the problems to solve</h2>
+<div class="container-md" style="margin-left: auto; margin-right: auto; max-width: 800px;">
+    {% block body %}
+    
+    {% if user.is_authenticated %}
+    <h1>Welcome {{user.username}}</h1>
+    {% else %}
+    <h1>Hi stranger</h1>
+    {% endif %}
+    
 
-<table class="table table-bordered table-hover">
-
-    <thead>
-        <tr>
-            <th scope="col">Title</th>
-            <th scope="col">Solved?</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for problem, is_solved in problems %}
-        <tr>
-            <td scope="row">
-                <a href="/problems/{{problem.problem_id}}"> {{problem.title}} </a>
-            </td>
-            <td>
+    <div  style="max-width: 500px; margin-left: auto; margin-right: auto;">
+        <p class="lg text-muted">Here are the problems to solve</p>
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
+                <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Solved?</th>
+                </tr>
+            </thead>
+        
+            <tbody>
+                {% for problem, is_solved in problems %}
                 {% if is_solved.solved %}
-                ✅
+                <tr style="background-color: rgb(163, 252, 163);">
                 {% else %}
-                ❎
+                <tr>
                 {% endif %}
-            </td>
-
-        </tr>
-        {% endfor %}
-    </tbody>
-
-
-</table>
-
-{% endblock %}
+                    <td scope="row">
+                        <a href="/problems/{{problem.problem_id}}"> {{problem.title}} </a>
+                    </td>
+                    <td>
+                        {% if is_solved.solved %}
+                        ✅
+                        {% else %}
+                        ❌
+                        {% endif %}
+                    </td>
+        
+                </tr>
+                {% endfor %}
+            </tbody>
+        
+        
+        </table>
+    </div>
+ 
+    
+    {% endblock %}
+</div>
