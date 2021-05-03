@@ -28,5 +28,4 @@ class SubmitView(LoginRequiredMixin,View):
         results = do_magic(file, user, problem_id)
         context['results'] = results
 
-
-        return render(request, self.template_name, context)
+        return render(request, self.result_template, context)

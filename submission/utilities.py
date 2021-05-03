@@ -1,10 +1,14 @@
 
 import os
 import threading
+import sys
 
 from problems.models import InputOutput
-from codingcompetition.settings import UPLOAD_DESTINATION, TIME_LIMIT
+from codingcompetition.settings import UPLOAD_DESTINATION, TIME_LIMIT, COMPILE_DESTINATION
 
+
+_COMPILER = "g++"
+_COMPILER_FLAGS = "--std=c++17"
 
 
 def do_magic(file, user, problem_id):
@@ -19,10 +23,12 @@ def do_magic(file, user, problem_id):
     '''
 
     # Save file on server
-    file_path = handle_file_upload(file,user, problem_id)
+    file_path, output_path = handle_file_upload(file,user, problem_id)
 
     # Compile the code
-    executable_path = compile(file_path)
+    executable_path = compile(file_path, output_path)
+
+    print(executable_path)
 
     # Get list of all test cases
     test_cases = get_all_testcases(problem_id)
@@ -30,7 +36,8 @@ def do_magic(file, user, problem_id):
     # For each test case create thread
     threads = []
     for test_case in test_cases:
-        threads.append(threading.Thread(test_on_case, args=(executable_path, test_case)))
+        print(test_case.input_data, test_case.output_data)
+        # threads.append(threading.Thread(test_on_case, args=(executable_path, test_case)))
 
 
         
@@ -47,23 +54,31 @@ def handle_file_upload(file, user, problem_id):
         :param problem_id: problem id for which solution file is uploaded for
     '''
 
-    file_path = UPLOAD_DESTINATION+user.username+str(problem_id)
+    file_path = UPLOAD_DESTINATION+user.username+str(problem_id) +".cpp"
+    output_path = get_output_file_path(user, problem_id)
 
     with open(file_path, 'wb+') as f:
         for chunks in file.chunks():
             f.write(chunks)
     
-    return file_path
+    return file_path, output_path
 
 
-def compile(file_path):
+def compile(file_path, out):
     '''
         Compiles the source code and forms same name output file.o
         returns compiled executable file path
 
         :param file_path: source code file path
     '''
-    pass
+    print("input file")
+    print(file_path)
+    os.system(
+        command=_COMPILER + " " + _COMPILER_FLAGS +
+        " " + file_path + " " + "-o" + " " + out,
+    )
+    
+    return out
 
 def test_on_case(executable_path, input_output):
     '''
@@ -90,11 +105,14 @@ def get_all_testcases(problem_id):
 
     return InputOutput.objects.filter(problem_id = problem_id).all()
 
-def get_output_file_path(input_file_path):
+def get_output_file_path(user, problem_id) -> str:
     '''
         Returns the file path, remove the extension of input file
         .cpp .c 
         and replace it with output executable file extension
         .o
     '''
-    pass
+    
+    output_file =  COMPILE_DESTINATION + user.username + str(problem_id) + ".o"
+    
+    return output_file

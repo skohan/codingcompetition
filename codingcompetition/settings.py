@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import django_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -142,6 +143,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Default destination of uploaded code
 UPLOAD_DESTINATION = 'submission/uploads/code/'
+# Compiled binary output path
+COMPILE_DESTINATION = 'submission/uploads/compiled/'
+
+# Input output form destination
+INPUT_UPLOAD = 'problems/io/' + 'input/'
+OUTPUT_UPLOAD = 'problems/io/' + 'output/'
 
 # Time limit for code execution
 TIME_LIMIT = 1 # in secs
+
+
+# Configure Django App for Heroku.
+django_heroku.settings(locals())

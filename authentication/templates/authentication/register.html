@@ -8,23 +8,7 @@
 
 
 <!--Register--> 
-<div class="container-sm" style="max-width: 500px;">
-    <form  method="POST">
-        {% csrf_token %}
-
-        <legend class="border-bottom mb-4">Sign Up to Join Us!</legend>
-        {{ register_form|crispy }}
-
-        <button type="submit" class="btn btn-primary">Register</button>
-
-        <div class="border-top pt-3 mt-3">
-            <small class="text-muted">
-                Already have account? <a href="/auth/login/"> Login </a>
-            </small>
-        </div>
-    </form>
-</div>
-<!-- <div class="container mt-3" style="max-width: 500px;">
+<div class="container mt-3" style="max-width: 500px;">
     <h1>Register here</h1>  
 
 	<form method="POST">
@@ -39,6 +23,6 @@
             Already have an account? <a class="ml-2" href="{% url 'login' %}"> Login </a>
         </small>
     </div>
-</div> -->
+</div>
 
 {% endblock %}
