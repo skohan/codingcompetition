@@ -7,3 +7,20 @@ index 6b6dd31..331feff 100644
 -
  from .development import *
 \ No newline at end of file
+diff --git a/codingcompetition/settings/development.py b/codingcompetition/settings/development.py
+index 7396536..cea6e31 100644
+--- a/codingcompetition/settings/development.py
++++ b/codingcompetition/settings/development.py
+@@ -1,5 +1,11 @@
+ 
+-
+ from .base import *
+ 
+ DEBUG = False
++
++DATABASES = {
++    'default': {
++        'ENGINE': 'django.db.backends.sqlite3',
++        'NAME': BASE_DIR / 'tmp/' 'db.sqlite3',
++    }
++}
