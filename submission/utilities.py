@@ -2,13 +2,16 @@
 import os
 import threading
 import sys
+import subprocess
+
+from django.db import transaction
 
 from problems.models import InputOutput
 from codingcompetition.settings import UPLOAD_DESTINATION, TIME_LIMIT, COMPILE_DESTINATION
 
 
-_COMPILER = "g++"
-_COMPILER_FLAGS = "--std=c++17"
+_COMPILER = "python3"
+_COMPILER_FLAGS = ""
 
 
 def do_magic(file, user, problem_id):
@@ -28,7 +31,7 @@ def do_magic(file, user, problem_id):
     # Compile the code
     executable_path = compile(file_path, output_path)
 
-    print(executable_path)
+    # print(executable_path)
 
     # Get list of all test cases
     test_cases = get_all_testcases(problem_id)
@@ -37,8 +40,10 @@ def do_magic(file, user, problem_id):
     threads = []
     for test_case in test_cases:
         print(test_case.input_data, test_case.output_data)
-        # threads.append(threading.Thread(test_on_case, args=(executable_path, test_case)))
+        threads.append(threading.Thread(test_on_case, args=(executable_path, test_case)))
 
+    for thread in threads:
+        thread.run()
 
         
 
@@ -49,12 +54,15 @@ def handle_file_upload(file, user, problem_id):
         file paht is as 
         ``UPLOAD_DESTINATION`` +``username``+``problem_id``+``file name``
 
+        :returns ``file_path``: Uploaded file path
+        :returns ``output_path``: For c compilers to produce ``.o`` file extention
+
         :param file: uploaded file
         :param user: user object from request
         :param problem_id: problem id for which solution file is uploaded for
     '''
 
-    file_path = UPLOAD_DESTINATION+user.username+str(problem_id) +".cpp"
+    file_path = UPLOAD_DESTINATION+user.username+str(problem_id) +".py"
     output_path = get_output_file_path(user, problem_id)
 
     with open(file_path, 'wb+') as f:
@@ -73,22 +81,25 @@ def compile(file_path, out):
     '''
     print("input file")
     print(file_path)
-    os.system(
-        command=_COMPILER + " " + _COMPILER_FLAGS +
-        " " + file_path + " " + "-o" + " " + out,
-    )
+    # os.system(
+    #     command=_COMPILER + " " + _COMPILER_FLAGS +
+    #     " " + file_path + " " + "-o" + " " + out,
+    # ) 
+    out = _COMPILER + " " + _COMPILER_FLAGS + " " + file_path
     
     return out
 
-def test_on_case(executable_path, input_output):
+@transaction.atomic
+def test_on_case(executable_command, input_output):
     '''
-        executes the executable's path given and provides input to it
-        returns final output
+        executes the command given and provides input to it
+        returns final standard output
 
-        :param executable_path: Path to executable
+        :param executable_command: Command to execute
         :param input: Input ``string`` to be given to executable
     '''
-    pass
+    sp = subprocess.Popen()
+
 
 def is_correct_output(actual_ouput, user_output):
     '''

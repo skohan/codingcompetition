@@ -25,7 +25,6 @@ class SubmitView(LoginRequiredMixin,View):
             messages.warning(request, "File not provided!!")
             return redirect('/problems/{}'.format(problem_id))
 
-        results = do_magic(file, user, problem_id)
-        context['results'] = results
+        do_magic(file, user, problem_id)
 
         return render(request, self.result_template, context)
