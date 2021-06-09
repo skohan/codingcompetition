@@ -1,6 +1,7 @@
 
 n = int(input())
 # n = 3
+# n = "askldhfskd"
 
 print(n, end=" ")
 
@@ -11,5 +12,8 @@ while n != 1:
         n *= 3
         n += 1
     print(int(n), end=" ")
-
-print(int(n))
+# print()
+# print()
+# print()
+# print(int(n))
+print("afhglafsjg;lfskjg;lskdjfg;lksjdf;gljdfk")

@@ -8,7 +8,7 @@ Problems {{problem.title}}
 {% block body %}
 {% load markdown_deux_tags %}
 
-<div class="container-md">
+<div class="container-md" id="app">
 	<div class="mt-5">
 		<a href="/problems/">
 			<button type="button" class="btn-outline-secondary btn">🔙 Go back</button>
@@ -33,18 +33,127 @@ Problems {{problem.title}}
 					<h2 class="text-muted">
 						Submit
 					</h2>
-					<form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data">
+					<div>
 						{% csrf_token %}
 						<p>Submit your cpp file here</p>
-						<input type="file" name="file" id="file">
-						<button class="btn btn-outline-primary mt-2">Run🏃‍♀️</button>
-					</form>
+						<input type="file" ref="file" id="file" v-on:change="changeFile">
+						<button class="btn btn-outline-primary mt-2" v-on:click="onSubmit">Run</button>
+
+					</div>
+					<!-- <form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data"> -->
+					<!-- </form> -->
+					<br>
+
+					<div class="row" v-if="running">
+						<div class="col">
+
+							<h4 class="text-muted">
+								Running
+							</h4>
+						</div>
+
+						<div class="col">
+
+							<div class="spinner-border " role="status">
+								<span class="sr-only">Running...</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- v-if="data" -->
+					<div v-if="result">
+						<h1>Data</h1>
+						<h4 class="text-muted">
+							{{ result.message }}
+						</h4>
+						<div v-for="(test, index) in result.data">
+							{% verbatim %}
+							Text case {{index}}:
+							<div v-if="test[1]">
+								Success
+							</div>
+							<div v-else>
+								
+									Failure: {{test[0]}}
+									
+								</div>
+							{% endverbatim %}
+						</div>
+					</div>
 				</div>
 		
 			</div>
 		</div>
-
-
 </div>
+
+<!-- Javascript to handle submission and solution -->
+<!-- Vuejs -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!-- Axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+	var app = new Vue({
+		el: "#app",
+
+		data:{
+			file: '',
+			running: false,
+			result: '',
+			url: "/submit/{{problem.problem_id}}"
+		},
+
+
+		methods: {
+			changeFile: function () {
+				this.file = this.$refs.file.files[0];
+			},
+
+			onSubmit: function () {
+				this.running = true
+
+				console.log("Submitting");
+				console.log(this.url);
+				if (this.file == '') {
+					console.log("file not selected");
+					this.running = false;
+					return;
+				}
+
+				let formData = new FormData();
+				formData.append('file', this.file);
+				formData.append("csrfmiddlewaretoken", '{{csrf_token}}');
+				// console.log(this.file);
+
+				axios.post(
+					this.url,
+					formData,
+					{
+						headers: {
+							'Content-Type': 'multipart/form-data'
+						}
+					}
+				).then(function(response){
+					if(
+						response.status == 200 
+						&&
+						response.statusText == 'OK'
+					)
+					{
+						console.log("SUCCESS!!!");
+						console.log(response.data);
+						app.result = JSON.parse(response.data);
+					}
+					app.running = false;
+
+				}).catch(function() {
+					console.log("Error");
+					app.running = false;
+				})
+			}
+		}
+	})
+
+</script>
 
 {% endblock %}

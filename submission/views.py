@@ -1,6 +1,7 @@
+import json
+from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from django.http import HttpResponseRedirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -25,6 +26,9 @@ class SubmitView(LoginRequiredMixin,View):
             messages.warning(request, "File not provided!!")
             return redirect('/problems/{}'.format(problem_id))
 
-        do_magic(file, user, problem_id)
+        verdict = do_magic(file, user, problem_id)
+        print(verdict)
+
+        return JsonResponse(data=json.dumps({"message":"Success", "data":verdict}), safe=False)
 
         return render(request, self.result_template, context)

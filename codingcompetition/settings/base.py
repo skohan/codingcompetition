@@ -151,7 +151,7 @@ INPUT_UPLOAD = 'problems/io/' + 'input/'
 OUTPUT_UPLOAD = 'problems/io/' + 'output/'
 
 # Time limit for code execution
-TIME_LIMIT = 1 # in secs
+TIME_LIMIT = 10 # in secs
 
 
 # Configure Django App for Heroku.

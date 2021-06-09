@@ -1,8 +1,8 @@
-
+from io import StringIO
 import os
 import threading
-import sys
-import subprocess
+from concurrent.futures import ThreadPoolExecutor 
+from subprocess import PIPE, Popen
 
 from django.db import transaction
 
@@ -37,16 +37,24 @@ def do_magic(file, user, problem_id):
     test_cases = get_all_testcases(problem_id)
 
     # For each test case create thread
-    threads = []
-    for test_case in test_cases:
-        print(test_case.input_data, test_case.output_data)
-        threads.append(threading.Thread(test_on_case, args=(executable_path, test_case)))
+    # threads = []
+    # for test_case in test_cases:
+    #     # print(test_case.input_data, test_case.output_data)
+    #     threads.append(threading.Thread(target=test_on_case, args=(executable_path, test_case,)))
 
-    for thread in threads:
-        thread.run()
+    # for thread in threads:
+    #     thread.start()
 
-        
+    # for thread in threads:
+    #     thread.join()
 
+    verdicts = []
+
+    with ThreadPoolExecutor() as executor:
+        futures = [executor.submit(test_on_case, executable_path, test_case ) for test_case in test_cases]
+        verdicts = [ f.result() for f in futures]
+
+    return verdicts
 
 def handle_file_upload(file, user, problem_id):
     '''
@@ -79,8 +87,8 @@ def compile(file_path, out):
 
         :param file_path: source code file path
     '''
-    print("input file")
-    print(file_path)
+    # print("input file")
+    # print(file_path)
     # os.system(
     #     command=_COMPILER + " " + _COMPILER_FLAGS +
     #     " " + file_path + " " + "-o" + " " + out,
@@ -90,23 +98,62 @@ def compile(file_path, out):
     return out
 
 @transaction.atomic
-def test_on_case(executable_command, input_output):
+def test_on_case(executable_command, test_cases):
     '''
-        executes the command given and provides input to it
+            executes the command given and provides input to it
         returns final standard output
 
         :param executable_command: Command to execute
         :param input: Input ``string`` to be given to executable
     '''
-    sp = subprocess.Popen()
+
+    sp = Popen(executable_command.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    # sp.wait(1)
+    # print(test_cases.input_data)
+    # print(test_cases.output_data)
+    verdict = True
+
+    output_file = test_cases.output_data
+    output_data = output_file.read()
+    input_file = test_cases.input_data
+    input_data = input_file.read()
+    
+    # sp.stdin(bytes(input_file.read(), 'utf-8'))
+    # sp.stdin(bytes(input_data))
+    try:
+        std_out, std_error = sp.communicate(input=input_data, timeout=TIME_LIMIT)
+        # print(std_out)
+        # print(std_error)
+    except Exception as e:
+        print(e)
+
+    # sleep(3)
+    if is_correct_output(std_out, output_data):
+        print("RIGHT!!!!!!!!!!!!!!!")
+        verdict = True
+
+    if std_error:
+        verdict = False
+        # print("there was a error", std_error)
 
 
-def is_correct_output(actual_ouput, user_output):
+    sp.kill()
+    
+    return (str(std_error.decode('utf-8')), verdict)
+
+
+
+def is_correct_output(actual_ouput:bytes, user_output:bytes):
     '''
         returns true if both match else false
     '''
 
-    return actual_ouput == user_output
+    ao = actual_ouput.decode('utf-8')
+    uo = user_output.decode('utf-8')
+    ao = ao.rstrip() # remove trailing whitespaces
+    uo = uo.rstrip() # remove trailing whitespaces
+
+    return ao == uo
 
 
 def get_all_testcases(problem_id):
