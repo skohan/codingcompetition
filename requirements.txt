@@ -13,7 +13,6 @@ beautifulsoup4==4.9.3
 bleach==3.2.1
 blinker==1.4
 bpytop==1.0.65
-Brlapi==0.7.0
 certifi==2020.11.8
 cffi==1.14.4
 chardet==3.0.4
