@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from .models import Problem
@@ -6,6 +7,7 @@ from problems.utilities import get_all_problems
 # Create your views here.
 
 
+@login_required()
 def problems(request):
 
     context = {}
@@ -17,7 +19,7 @@ def problems(request):
     return render(request, 'home/home.html', context)
 
     
-
+@login_required()
 def problem_by_id(request, problem_id):
     
     context = {}
