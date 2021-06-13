@@ -4,8 +4,8 @@ print(n, end=" ")
 # n = 3
 # n = "askldhfskd"
 
-# while True:
-    # pass
+while True:
+    pass
 
 # while True:
     # pass

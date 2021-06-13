@@ -1,12 +1,18 @@
-
 {% extends 'base.html' %}
 
-{% block title %} 
+{% block title %}
 Problems {{problem.title}}
 {% endblock %}
 
 {% block body %}
 {% load markdown_deux_tags %}
+
+{% load static %}
+
+<!-- Vuejs -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!-- Axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <div class="container-md" id="app">
 	<div class="mt-5">
@@ -15,91 +21,120 @@ Problems {{problem.title}}
 		</a>
 	</div>
 
-		<div class="container-lg mt-5" style="max-width: 900px; margin-left: auto; margin-right: auto;">
-			<div class="row">
-				<div class="col-md-8">
+	<div class="container-lg mt-5" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+		<div class="row">
+			<div class="col-md-8">
 
-						<h2 class="text-muted">
-							{{problem.title}}
-						</h2>
-					
+				<h2 class="text-muted">
+					{{problem.title}}
+				</h2>
+
 				<p>
 					{{problem.description|markdown}}
 				</p>
-		
-				</div>
-		
-				<div class="col-md-4">
-					<h2 class="text-muted">
-						Submit
-					</h2>
-					<div>
-						{% csrf_token %}
-						<p>Submit your cpp file here</p>
-						<input type="file" ref="file" id="file" v-on:change="changeFile">
-						<button class="btn btn-outline-primary mt-2" v-on:click="onSubmit">Run</button>
 
-					</div>
-					<!-- <form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data"> -->
-					<!-- </form> -->
-					<br>
-
-					<div class="row" v-if="running">
-						<div class="col">
-
-							<h4 class="text-muted">
-								Running
-							</h4>
-						</div>
-
-						<div class="col">
-
-							<div class="spinner-border " role="status">
-								<span class="sr-only">Running...</span>
-							</div>
-						</div>
-					</div>
-
-					<!-- v-if="data" -->
-					<div v-if="result">
-						<h1>Data</h1>
-						<h4 class="text-muted">
-							{{ result.message }}
-						</h4>
-						<div v-for="(test, index) in result.data">
-							{% verbatim %}
-							Text case {{index}}:
-							<div v-if="test[1]">
-								Success
-							</div>
-							<div v-else>
-								
-									Failure: {{test[0]}}
-									
-								</div>
-							{% endverbatim %}
-						</div>
-					</div>
-				</div>
-		
 			</div>
+
+			<div class="col-md-4">
+				<h2 class="text-muted">
+					Submit
+				</h2>
+				<div>
+					<p>Language</p>
+					<select v-model="lang">
+						<option disabled value="">Please select one</option>
+						<option>c++</option>
+						<option>python3</option>
+					</select>
+					{% csrf_token %}
+					{% verbatim %}
+					<p>Submit your {{ lang }} file here</p>
+					{% endverbatim %}
+
+					<input type="file" ref="file" id="file" v-on:change="changeFile">
+					<button class="btn btn-outline-primary mt-2" v-on:click="onSubmit">Run</button>
+
+				</div>
+				<!-- <form action="/submit/{{problem.problem_id}}" method="POST" enctype="multipart/form-data"> -->
+				<!-- </form> -->
+				<br>
+
+				<div class="row" v-if="running">
+					<div class="col">
+
+						<h4 class="text-muted">
+							Running
+						</h4>
+					</div>
+
+					<div class="col">
+
+						<div role="status">
+							<span class="sr-only">Running...</span>
+						</div>
+						<img src="{% static 'problems/loading.gif' %}" alt="My image">
+
+					</div>
+				</div>
+
+				<!-- v-if="data" -->
+				<div v-if="result">
+					{% verbatim %}
+					<p v-if="result.message == 'Success'" class="alert alert-success">
+						{{ result.message }}
+					</p>
+					<p v-else class="alert alert-danger">
+						{{ result.message }}
+					</p>
+					<h2>Result</h2>
+					<table class="table table-bordered table-hover mt-3">
+						<thead>
+							<tr>
+								<th>Test case</th>
+								<th>Result</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(test, index) in result.data">
+								<td>
+									Test case {{index}}
+								</td>
+								<td>
+									<div v-if="test[1]">
+										<p class="alert alert-success">
+											Success
+										</p>
+									</div>
+									<div v-else>
+										<p class="alert alert-danger">
+											Failure: {{test[0]}}
+										</p>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+					{% endverbatim %}
+				</div>
+			</div>
+
 		</div>
+	</div>
 </div>
 
 <!-- Javascript to handle submission and solution -->
-<!-- Vuejs -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-<!-- Axios -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 <script>
 
 	var app = new Vue({
 		el: "#app",
 
-		data:{
+		data: {
 			file: '',
 			running: false,
 			result: '',
+			lang: '',
 			url: "/submit/{{problem.problem_id}}"
 		},
 
@@ -117,12 +152,22 @@ Problems {{problem.title}}
 				if (this.file == '') {
 					console.log("file not selected");
 					this.running = false;
+					this.result = { message: "File not selected" };
 					return;
 				}
+
+				if (this.lang == '') {
+					console.log("language not selected");
+					this.running = false;
+					this.result = { message: "Language not selected" };
+					return;
+				}
+
 
 				let formData = new FormData();
 				formData.append('file', this.file);
 				formData.append("csrfmiddlewaretoken", '{{csrf_token}}');
+				formData.append('lang', this.lang);
 				// console.log(this.file);
 
 				axios.post(
@@ -133,20 +178,19 @@ Problems {{problem.title}}
 							'Content-Type': 'multipart/form-data'
 						}
 					}
-				).then(function(response){
-					if(
-						response.status == 200 
+				).then(function (response) {
+					if (
+						response.status == 200
 						&&
 						response.statusText == 'OK'
-					)
-					{
-						console.log("SUCCESS!!!");
+					) {
+						console.log("Successfully submitted");
 						console.log(response.data);
 						app.result = JSON.parse(response.data);
 					}
 					app.running = false;
 
-				}).catch(function() {
+				}).catch(function () {
 					console.log("Error");
 					app.running = false;
 				})

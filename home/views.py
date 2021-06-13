@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 
 
@@ -13,6 +14,18 @@ def landing_page(request):
 
 def user_info(request, username):
     return render(request, "home/user.html")
+
+def leaderboard(request):
+
+    context = {}
+
+    scoreboard = Solved.objects.values('user__username').annotate(score=Sum('score')).order_by('date')
+    # print(scoreboard)
+    context['scoreboard'] = scoreboard
+
+    return render(request, "home/leaderboard.html", context)
+
+
 
 @login_required()
 def user_home(request):

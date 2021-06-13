@@ -153,6 +153,11 @@ OUTPUT_UPLOAD = 'problems/io/' + 'output/'
 # Time limit for code execution
 TIME_LIMIT = 10 # in secs
 
+LANGS   = ["python3", "c++"]
+LANG_EXT    = {
+        "python3"   : ".py",
+        "c++"       : ".cpp"
+}
 
 # Configure Django App for Heroku.
 django_heroku.settings(locals())

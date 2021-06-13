@@ -1,3 +1,4 @@
+from codingcompetition.settings.base import LANGS
 import json
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
@@ -6,29 +7,42 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+from .update import update_user_score
 from .utilities import do_magic
 # Create your views here.
 
-class SubmitView(LoginRequiredMixin,View):
-    
+
+class SubmitView(LoginRequiredMixin, View):
+
     submit_template = ''
     result_template = 'submission/result.html'
     file_name = 'file'
 
-    def post(self, request, problem_id):
+    def post(self, request, problem_id:int):
 
         context = {}
-        
+
         user = request.user
         file = request.FILES.get(self.file_name)
+        lang = request.POST.get('lang')
 
-        if file == None:
-            messages.warning(request, "File not provided!!")
+        # print("Language ", lang)
+
+        if file == None or lang not in LANGS:
+            return JsonResponse(data=json.dumps({
+                "message":  "File not provided or language not selected!!", 
+                "data": []}), safe=False)
+            messages.warning(
+                request, "File not provided or language not selected!!")
             return redirect('/problems/{}'.format(problem_id))
 
-        verdict = do_magic(file, user, problem_id)
+        verdict = do_magic(file, user, problem_id, lang)
         print(verdict)
 
-        return JsonResponse(data=json.dumps({"message":"Success", "data":verdict}), safe=False)
+
+        v = update_user_score(user, problem_id, verdict)
+        message = "Success" if v else "Failure"
+
+        return JsonResponse(data=json.dumps({"message": message, "data": verdict}), safe=False)
 
         return render(request, self.result_template, context)
