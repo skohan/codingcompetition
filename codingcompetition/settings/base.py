@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import date, datetime
 import django_heroku
 from pathlib import Path
 
@@ -161,3 +162,6 @@ LANG_EXT    = {
 
 # Configure Django App for Heroku.
 django_heroku.settings(locals())
+
+contest_start_time  = datetime.now()
+contest_end_time    = datetime.now()

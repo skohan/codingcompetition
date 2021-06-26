@@ -4,9 +4,11 @@ from django.shortcuts import render
 from .models import Problem
 from home.models import Solved
 from problems.utilities import get_all_problems
+from .decorators import contest_timing_handler
 # Create your views here.
 
 
+# @contest_timing_handler()
 @login_required()
 def problems(request):
 
@@ -18,7 +20,8 @@ def problems(request):
 
     return render(request, 'home/home.html', context)
 
-    
+
+# @contest_timing_handler()
 @login_required()
 def problem_by_id(request, problem_id):
     

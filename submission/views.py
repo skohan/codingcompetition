@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .update import update_user_score
 from .utilities import do_magic
+from .decorators import contest_is_over
 # Create your views here.
 
 
@@ -39,7 +40,9 @@ class SubmitView(LoginRequiredMixin, View):
         verdict = do_magic(file, user, problem_id, lang)
         print(verdict)
 
-
+        # if contest_is_over():
+        #     message = "Contest is over! Your submissions will not count toward leaderboard position"
+        # else:
         v = update_user_score(user, problem_id, verdict)
         message = "Success" if v else "Failure"
 
